@@ -170,4 +170,4 @@ public class PostActivity extends AppCompatActivity {
         binding.uploadImage.setVisibility(imagenesUrls.size() < MAX_IMAGES ? View.VISIBLE : View.GONE);
     }
 
-}
+}//llave
