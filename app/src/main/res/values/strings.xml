@@ -1,0 +1,43 @@
+<resources>
+    <string name="app_name">Compartiendo el mundo</string>
+    <string name="back4app_server_url">https://parseapi.back4app.com/</string>
+    <!-- Paste BOTH strings as required -->
+    <string name="back4app_app_id">9A2fs5owIlOOYIfSKNHO34rqaPKd4x3cVjhFmkOj</string>
+    <string name="back4app_client_key">8OWaXgQlA6nQm13unBXxrDN618vCAIosGtJcafyy</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+
+    <string name="mis_experiencias">Mis Lugares Preferidos</string>
+    <string name="Chats">Chats</string>
+    <string name="sin_cuenta">¿No tienes cuenta?</string>
+    <string name="Perfil">Perfil</string>
+    <string name="titulo_perfil">Modifica tus datos</string>
+    <string name="Filtros">Filtros</string>
+    <string name="publicaciones">PUBLICACIONES</string>
+    <string name="redsocial">Instagram</string>
+    <string name="imagen_description">Describe tu imagen</string>
+    <string name="titulo_ppal">Realizar un Post</string>
+    <string name="titulo_post">Lugar que Visitaste</string>
+    <string name="lugar">Lugar</string>
+    <string name="registrate">REGISTRATE</string>
+    <string name="nombre_usuario">Nombre de Usuario</string>
+    <string name="correo">Correo Electrónico</string>
+    <string name="pass">Contraseña</string>
+    <string name="pass1">Confirmar Contraseña</string>
+    <string name="descripcion">Descripción de tu experiencia...</string>
+    <string name="presupuesto">Presupuesto estimado (USD)</string>
+    <string name="duracion">Duración del viaje (ej. 3 días)</string>
+    <string name="publicar">Publicar</string>
+    <string name="actualizar">Actualizar Perfil</string>
+    <string name="transitionname_picture">transitionnamepicture</string>
+    <string-array name="categorias_array">
+        <!-- Aquí puedes añadir tus categorías -->
+        <item>Naturaleza</item>
+        <item>Montaña</item>
+        <item>Aventura</item>
+        <item>Cultura</item>
+        <item>Playa</item>
+    </string-array>
+
+</resources>
