@@ -1,6 +1,7 @@
 package com.example.appchat.view;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -59,19 +60,14 @@ public class HomeActivity extends AppCompatActivity {
         fragmentTransaction.replace(R.id.fragmentContainer, fragment);
         fragmentTransaction.commit();
 
-        new Thread(() -> {
-            try {
-                // Simula un tiempo de espera de 2 segundos
-                Thread.sleep(3000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+        // Crea un Handler para programar la ocultación del ProgressBar
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                // Este código se ejecutará después de 2 segundos (2000 milisegundos)
+                hideProgressBar();
             }
-
-            runOnUiThread(() -> {
-                // Aquí simula que se han cargado los datos.
-                hideProgressBar(); // Oculta el ProgressBar después de que se simula que los datos han sido cargados.
-            });
-        }).start();
+        }, 3000); // Tiempo de retraso en milisegundos
     }
 
     public void hideProgressBar() {
