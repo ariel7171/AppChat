@@ -13,6 +13,7 @@
         <io.github.florent37.shapeofview.shapes.DiagonalView
             android:layout_width="match_parent"
             android:layout_height="250dp"
+
             app:shape_diagonal_angle="10"
             app:shape_diagonal_position="bottom">
             <View
@@ -22,7 +23,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                >
                 <TextView
                     android:id="@+id/textView"
                     android:layout_width="wrap_content"
@@ -31,6 +33,7 @@
                     android:layout_marginTop="40dp"
                     android:text="@string/app_name"
                     android:textColor="@color/colorGray"
+
                     android:textSize="13sp" />
                 <ImageView
                     android:layout_width="220dp"
@@ -38,6 +41,7 @@
                     android:src="@drawable/icono_ppal"
                     android:padding="10dp" />
             </LinearLayout>
+
         </io.github.florent37.shapeofview.shapes.DiagonalView>
         <LinearLayout
             android:layout_width="match_parent"
@@ -52,12 +56,14 @@
                 android:layout_height="30dp"
                 android:src="@drawable/ic_email"
                 android:layout_marginRight="5dp"
-                android:layout_gravity="center" />
+                android:layout_gravity="center"
+                />
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                app:boxBackgroundMode="none">
+                app:boxBackgroundMode="none"
+                >
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/itUsuario"
                     android:layout_width="match_parent"
@@ -81,18 +87,21 @@
                 android:layout_height="30dp"
                 android:src="@drawable/ic_lock"
                 android:layout_marginRight="5dp"
-                android:layout_gravity="center" />
+                android:layout_gravity="center"
+                />
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                app:boxBackgroundMode="none">
+                app:boxBackgroundMode="none"
+                >
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/itPassword"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/pass"
                     android:inputType="textPassword">
+
                 </com.google.android.material.textfield.TextInputEditText>
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
@@ -117,7 +126,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/sin_cuenta"
-            android:textSize="17sp"/>
+            android:textSize="17sp" />
         <TextView
             android:id="@+id/tvRegistro"
             android:layout_width="wrap_content"
@@ -125,6 +134,6 @@
             android:layout_marginLeft="5dp"
             android:text="@string/registrate"
             android:textStyle="bold"
-            android:textSize="17sp"/>
+            android:textSize="17sp" />
     </LinearLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

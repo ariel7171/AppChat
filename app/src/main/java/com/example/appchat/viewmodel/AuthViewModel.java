@@ -6,15 +6,12 @@ import androidx.lifecycle.ViewModel;
 import com.example.appchat.providers.AuthProvider;
 
 public class AuthViewModel extends ViewModel {
-
-    private AuthProvider authProvider;
+    private final AuthProvider authProvider;
 
     public AuthViewModel() {
-        authProvider = new AuthProvider();
+        this.authProvider = new AuthProvider();
     }
 
-    public LiveData<Boolean> logOut() {
-        return authProvider.logOut();
-    }
-
-}
+    public LiveData<Boolean> logout() {
+        return authProvider.logout();
+    }}

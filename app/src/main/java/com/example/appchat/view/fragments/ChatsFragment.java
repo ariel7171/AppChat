@@ -1,28 +1,25 @@
+
 package com.example.appchat.view.fragments;
-
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import com.example.appchat.R;
-import com.example.appchat.databinding.FragmentChatsBinding;
-
+import androidx.fragment.app.Fragment;
 
 public class ChatsFragment extends Fragment {
 
-    private FragmentChatsBinding binding;
+    public ChatsFragment() {
 
-    public ChatsFragment() {}
+    }
 
-    public static ChatsFragment newInstance(String p1, String p2) {
+    public static ChatsFragment newInstance(String param1, String param2) {
         return new ChatsFragment();
     }
+
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_chats, container, false);
     }
 }

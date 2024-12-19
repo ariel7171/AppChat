@@ -1,77 +1,100 @@
 package com.example.appchat.model;
-
+import android.os.Bundle;
+import com.parse.ParseClassName;
+import com.parse.ParseObject;
+import java.util.ArrayList;
 import java.util.List;
 
-public class Post {
-    private String titulo, descripcion, categoria;
-    private int duracion;
-    private double presupuesto;
-    private List<String> imagenes;
-
-    public Post() {}
-
-    public Post(String titulo, String descripcion, int duracion, String categoria, double presupuesto) {
-        this.titulo = titulo;
-        this.descripcion = descripcion;
-        this.duracion = duracion;
-        this.categoria = categoria;
-        this.presupuesto = presupuesto;
+@ParseClassName("Post")
+public class Post extends ParseObject {
+    public String getId() {
+        return getObjectId();
     }
-
-    public Post(String titulo, String descripcion, int duracion, String categoria, double presupuesto, List<String> imagenes) {
-        this.titulo = titulo;
-        this.descripcion = descripcion;
-        this.duracion = duracion;
-        this.categoria = categoria;
-        this.presupuesto = presupuesto;
-        this.imagenes = imagenes;
-    }
-
     public String getTitulo() {
-        return titulo;
+        return getString("titulo");
     }
-
     public void setTitulo(String titulo) {
-        this.titulo = titulo;
+        put("titulo", titulo);
     }
 
+    // Getter y setter para "descripcion"
     public String getDescripcion() {
-        return descripcion;
+        return getString("descripcion");
     }
 
     public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
+        put("descripcion", descripcion);
     }
 
+    // Getter y setter para "duracion"
     public int getDuracion() {
-        return duracion;
+        return getInt("duracion");
     }
 
     public void setDuracion(int duracion) {
-        this.duracion = duracion;
+        put("duracion", duracion);
     }
 
+    // Getter y setter para "categoria"
     public String getCategoria() {
-        return categoria;
+        return getString("categoria");
     }
 
     public void setCategoria(String categoria) {
-        this.categoria = categoria;
+        put("categoria", categoria);
     }
 
+    // Getter y setter para "presupuesto"
     public double getPresupuesto() {
-        return presupuesto;
+        return getDouble("presupuesto");
     }
 
     public void setPresupuesto(double presupuesto) {
-        this.presupuesto = presupuesto;
+        put("presupuesto", presupuesto);
     }
 
+    // Getter y setter para "imagenes"
     public List<String> getImagenes() {
-        return imagenes;
+        return getList("imagenes");
     }
 
     public void setImagenes(List<String> imagenes) {
-        this.imagenes = imagenes;
+        put("imagenes", imagenes);
+    }
+
+    // Getter y setter para "user"
+    public User getUser() {
+        return (User)getParseObject("user");
+    }
+
+    public void setUser(User user) {
+        put("user", user);
+    }
+
+    // Método para exportar los datos del post como un Bundle
+    public Bundle toBundle() {
+        Bundle bundle = new Bundle();
+        bundle.putString("titulo", getTitulo());
+        bundle.putString("descripcion", getDescripcion());
+        bundle.putString("categoria", getCategoria());
+        bundle.putInt("duracion", getDuracion());
+        bundle.putDouble("presupuesto", getPresupuesto());
+
+        // Datos del Usuario
+        User user = getUser();
+        if (user != null) {
+            bundle.putString("username", user.getUsername());
+            bundle.putString("email", user.getEmail());
+            bundle.putString("insta", user.getRedSocial());
+            bundle.putString("fotoperfil", user.getString("foto_perfil"));
+            
+        }
+
+        // Lista de imágenes
+        bundle.putStringArrayList("imagenes", new ArrayList<>(getImagenes()));
+        return bundle;
     }
 }
+
+
+

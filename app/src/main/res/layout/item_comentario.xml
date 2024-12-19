@@ -1,0 +1,20 @@
+<!-- item_comentario.xml -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="8dp">
+
+    <TextView
+        android:id="@+id/tvUsuario"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:id="@+id/tvComentario"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <!-- Puedes añadir más elementos visuales según necesites -->
+</LinearLayout>

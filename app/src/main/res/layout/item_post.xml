@@ -4,14 +4,14 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="16dp"
-    >
+    android:background="?android:attr/selectableItemBackground">
 
     <!-- Título del post -->
     <TextView
         android:id="@+id/tvTitulo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/lugar"
+        android:text="Título"
         android:textSize="18sp"
         android:textStyle="bold"
         android:paddingBottom="8dp" />
@@ -21,7 +21,7 @@
         android:id="@+id/tvDescripcion"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/imagen_description"
+        android:text="Descripción del post"
         android:textSize="14sp"
         android:paddingBottom="8dp" />
 

@@ -1,8 +1,14 @@
 package com.example.appchat.view;
-
+import com.example.appchat.R;
+import com.example.appchat.adapters.ImageAdapter;
+import com.example.appchat.databinding.ActivityPostBinding;
+import com.example.appchat.util.ImageUtils;
+import com.example.appchat.viewmodel.PostViewModel;
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,32 +16,24 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
-import android.Manifest;
-
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
-
-
-import com.example.appchat.R;
-import com.example.appchat.adapters.ImageAdapter;
-import com.example.appchat.databinding.ActivityPostBinding;
 import com.example.appchat.model.Post;
-import com.example.appchat.util.ImageUtils;
 import com.example.appchat.util.Validaciones;
-import com.example.appchat.viewmodel.PostViewModel;
+import com.parse.ParseObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class PostActivity extends AppCompatActivity {
-
     private static final int MAX_IMAGES = 3;
-    private static final int REQUEST_IMAGE = 1;
-
+    private final int REQUEST_IMAGE = 1;
     private ActivityPostBinding binding;
+
     private PostViewModel postViewModel;
     private final List<String> imagenesUrls = new ArrayList<>();
     private ImageAdapter adapter;
@@ -48,16 +46,14 @@ public class PostActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityPostBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
-        setupRecycLerView();
+        setupRecyclerView();
         setupViewModels();
         setupCategorySpinner();
         setupGalleryLauncher();
-
         binding.btnPublicar.setOnClickListener(v -> publicarPost());
     }
 
-    private void setupRecycLerView() {
+    private void setupRecyclerView() {
         adapter = new ImageAdapter(imagenesUrls, this);
         binding.recyclerView.setLayoutManager(new GridLayoutManager(this, 3));
         binding.recyclerView.setAdapter(adapter);
@@ -66,21 +62,18 @@ public class PostActivity extends AppCompatActivity {
 
     private void setupViewModels() {
         postViewModel = new ViewModelProvider(this).get(PostViewModel.class);
-        postViewModel.getPostSuccess().observe(this, success -> {
-            String message = success ? "Post publicado con éxito" : "Error al publicar";
-            Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-            if (success) finish();
+        postViewModel.getPostSuccess().observe(this, exito -> {
+            Toast.makeText(this, exito, Toast.LENGTH_SHORT).show();
+            finish();
         });
     }
 
     private void setupCategorySpinner() {
-        // Implementa la configuración del spinner de categorías aquí
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
                 this, R.layout.spinner_item, getResources().getStringArray(R.array.categorias_array)
         );
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         binding.spinnerCategoria.setAdapter(adapter);
-
         binding.spinnerCategoria.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -93,7 +86,6 @@ public class PostActivity extends AppCompatActivity {
             }
         });
     }
-
     @SuppressLint("NotifyDataSetChanged")
     private void setupGalleryLauncher() {
         galleryLauncher = registerForActivityResult(
@@ -122,22 +114,16 @@ public class PostActivity extends AppCompatActivity {
                     }
                 }
         );
-
-        binding.uploadImage.setOnClickListener(v -> {
-            Log.d("PostActivity", "Botón clicado");
-            ImageUtils.pedirPermisos(PostActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_IMAGE);
-            ImageUtils.openGallery(PostActivity.this, galleryLauncher);
-            Log.d("PostActivity", "galeria abierta");
-        });
+        binding.uploadImage.setOnClickListener(v -> ImageUtils.pedirPermisos(PostActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_IMAGE));
     }
 
-    private void publicarPost() { // usage mariel
+    private void publicarPost() {
         String titulo = binding.itTitulo.getText().toString().trim();
         String descripcion = binding.etDescripcion.getText().toString().trim();
         String duracionStr = binding.etDuracion.getText().toString().trim();
         String presupuestoStr = binding.etPresupuesto.getText().toString().trim();
 
-        // Validar campos
+
         if (!Validaciones.validarTexto(titulo)) {
             binding.itTitulo.setError("El título no es válido");
             return;
@@ -151,7 +137,6 @@ public class PostActivity extends AppCompatActivity {
             binding.etDuracion.setError("Duración no válida");
             return;
         }
-
         double presupuesto;
         try {
             presupuesto = Double.parseDouble(presupuestoStr);
@@ -159,15 +144,32 @@ public class PostActivity extends AppCompatActivity {
             binding.etPresupuesto.setError("Presupuesto no válido");
             return;
         }
-
-        Post post = new Post(titulo, descripcion, duracion, categoria, presupuesto, new ArrayList<>(imagenesUrls));
+        Post post = new Post();
+        post.setTitulo(titulo);
+        post.setDescripcion(descripcion);
+        post.setDuracion(duracion);
+        post.setCategoria(categoria);
+        post.setPresupuesto(presupuesto);
+        post.setImagenes(new ArrayList<>(imagenesUrls));
         postViewModel.publicar(post);
     }
 
-    private void updateRecyclerViewVisibility() { // 2 usages mariel
+    private void updateRecyclerViewVisibility() {
         boolean hasImages = !imagenesUrls.isEmpty();
         binding.recyclerView.setVisibility(hasImages ? View.VISIBLE : View.GONE);
         binding.uploadImage.setVisibility(imagenesUrls.size() < MAX_IMAGES ? View.VISIBLE : View.GONE);
     }
 
-}//llave
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        Log.d("PostActivity", "onRequestPermissionsResult ejecutado");
+        if (requestCode == REQUEST_IMAGE && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            Log.d("PostActivity", "Permiso concedido, abriendo galería");
+            ImageUtils.openGallery(PostActivity.this, galleryLauncher);
+        } else {
+            Log.d("PostActivity", "Permiso denegado");
+            Toast.makeText(this, "Permiso denegado", Toast.LENGTH_SHORT).show();
+        }
+    }
+}

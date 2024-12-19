@@ -1,18 +1,16 @@
 package com.example.appchat.view;
-
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import com.example.appchat.R;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-
-import com.example.appchat.R;
 import com.example.appchat.databinding.ActivityHomeBinding;
 import com.example.appchat.view.fragments.ChatsFragment;
 import com.example.appchat.view.fragments.FiltrosFragment;
@@ -21,7 +19,6 @@ import com.example.appchat.view.fragments.PerfilFragment;
 import com.google.android.material.navigation.NavigationBarView;
 
 public class HomeActivity extends AppCompatActivity {
-
     private ActivityHomeBinding binding;
 
     @Override
@@ -32,42 +29,33 @@ public class HomeActivity extends AppCompatActivity {
 
         //agrego un progress bar carando datos
         LayoutInflater inflater = LayoutInflater.from(this);
-        View progressBarLayout = inflater.inflate(R.layout.progress_layout, binding.main, false);
-        binding.main.addView(progressBarLayout);
+        View progressBarLayout = inflater.inflate(R.layout.progress_layout, binding.mainCont, false);
+        binding.mainCont.addView(progressBarLayout);
         //
 
-        binding.bottomNav.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
+        binding.bottomNavigation.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                if (item.getItemId() == R.id.navItemHome) {
-                    openFragment(HomeFragment.newInstance("", ""));
-                } else if (item.getItemId() == R.id.navItemFiltros) {
-                    openFragment(new FiltrosFragment());
-                } else if (item.getItemId() == R.id.navItemCharts) {
+                if (item.getItemId() == R.id.itemHome) {
+                    openFragment(HomeFragment.newInstance()); // Pasamos userId aquí
+                } else if (item.getItemId() == R.id.itemChats) {
                     openFragment(new ChatsFragment());
-                } else if (item.getItemId() == R.id.navItemPerfil) {
+                } else if (item.getItemId() == R.id.itemPerfil) {
                     openFragment(new PerfilFragment());
+                } else if (item.getItemId() == R.id.itemFiltros) {
+                    openFragment(new FiltrosFragment());
                 }
                 return true;
             }
         });
-        openFragment(HomeFragment.newInstance("", ""));
+        openFragment(HomeFragment.newInstance()); // Pasa userId aquí también
     }
 
     private void openFragment(Fragment fragment) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.fragmentContainer, fragment);
+        fragmentTransaction.replace(R.id.container, fragment);
         fragmentTransaction.commit();
-
-        // Crea un Handler para programar la ocultación del ProgressBar
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                // Este código se ejecutará después de 2 segundos (2000 milisegundos)
-                hideProgressBar();
-            }
-        }, 3000); // Tiempo de retraso en milisegundos
     }
 
     public void hideProgressBar() {
@@ -76,5 +64,5 @@ public class HomeActivity extends AppCompatActivity {
             progressBarLayout.setVisibility(View.GONE);
         }
     }
-
 }
+

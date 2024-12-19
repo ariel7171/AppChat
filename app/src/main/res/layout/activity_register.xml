@@ -120,12 +120,14 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 app:boxBackgroundMode="none"
                 >
+
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/itPassword"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/pass"
-                    android:inputType="textPassword">
+                    android:inputType="textPassword"
+                    android:textColorHint="#616161">
 
                 </com.google.android.material.textfield.TextInputEditText>
             </com.google.android.material.textfield.TextInputLayout>

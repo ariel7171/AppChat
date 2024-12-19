@@ -13,8 +13,5 @@
     <color name="lavender">#8692f7</color>
     <color name="colorGray">#D5D2D2</color>
     <color name="colorGrayLight">#F1EFEF</color>
-    <color name="grey">#9b9b9b</color>
-    <color name="colorPrimary">#00ABE4</color>
-    <color name="colorPrimaryDark">#2D3B7B</color>
-    <color name="colorAccent">#E9F1FA</color>
+    <color name="colorGrayIcon">#BEBEBE</color>
 </resources>
