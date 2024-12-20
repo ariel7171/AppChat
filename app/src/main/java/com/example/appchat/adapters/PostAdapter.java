@@ -85,6 +85,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
                     intent.putExtra("post", post);
                     intent.putExtra("idPost", post.getId());
                     intent.putExtra("titulo", postDetail.getTitulo());
+
                     intent.putExtra("descripcion", postDetail.getDescripcion());
                     intent.putExtra("categoria", postDetail.getCategoria());
                     intent.putExtra("duracion", postDetail.getDuracion());
@@ -92,6 +93,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
 
                     // Datos del Usuario
                     User user = postDetail.getUser();
+                    Log.d("PosDetail", "User: " + user.getEmail() + " " + user.getUsername());
                     if (user != null) {
                         Log.d("Postadapter", user.getUsername());
                         intent.putExtra("username", user.getUsername());

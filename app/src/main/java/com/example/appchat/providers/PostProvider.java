@@ -176,22 +176,28 @@ public class PostProvider {
                 } catch (ParseException parseException) {
                     parseException.printStackTrace();
                 }
+
+                /*
                 ParseObject userObject = post.getParseObject("user");
                 if (userObject != null) try {
+                    Log.d("PostProviderEmail", " Userobject"+userObject.getString("email"));
                     userObject.fetchIfNeeded();
                     User user = new User();
+                    Log.d("PostProviderEmail", " Userobject"+userObject.getString("email"));
                     user.setUsername(userObject.getString("username"));
                     user.setEmail(userObject.getString("email"));
                     user.setFotoperfil(userObject.getString("foto_perfil"));
 
                     post.setUser(user);
+
+
                 } catch (ParseException userFetchException) {
                     userFetchException.printStackTrace();
                 }
                 else {
                     Log.w("PostDetail", "El usuario asociado al post es nulo.");
                 }
-
+                */
                 result.setValue(post);
             } else {
                 Log.e("ParseError", "Error al obtener el post: ", e);

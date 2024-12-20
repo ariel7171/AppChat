@@ -64,7 +64,7 @@ public class Post extends ParseObject {
 
     // Getter y setter para "user"
     public User getUser() {
-        return (User)getParseObject("user");
+        return (User)getParseUser("user");
     }
 
     public void setUser(User user) {

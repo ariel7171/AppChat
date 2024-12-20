@@ -9,6 +9,7 @@ public class User extends ParseUser {
 
     public User() {
         // Constructor vacío necesario para Parse
+
     }
 
     public String getRedSocial() {
