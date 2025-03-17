@@ -40,4 +40,17 @@ public class UserViewModel extends ViewModel {
     public LiveData<List<User>> getAllUsers() {
         return userProvider.getAllUsers(); // Llama al método para obtener todos los usuarios en UserProvider
     }
+
+    public LiveData<String> getEmailUsuarioLiveData() {
+        return userProvider.getEmailUsuarioLiveData();
+    }
+
+    public LiveData<String> getErrorLiveData() {
+        return userProvider.getErrorLiveData();
+    }
+
+    public void obtenerEmailUsuario(String targetUserId) {
+        userProvider.obtenerEmailUsuario(targetUserId);
+    }
+
 }

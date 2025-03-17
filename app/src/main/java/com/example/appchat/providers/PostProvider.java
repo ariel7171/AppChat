@@ -194,6 +194,7 @@ public class PostProvider {
                     Log.w("PostDetail", "El usuario asociado al post es nulo.");
                 }
                 */
+                Log.d("PostDetailEmail", "User Email: " + post.getUser().getEmail());
                 result.setValue(post);
             } else {
                 Log.e("ParseError", "Error al obtener el post: ", e);
@@ -296,6 +297,8 @@ public class PostProvider {
         });
         return result;
     }
+
+
 
 }
 

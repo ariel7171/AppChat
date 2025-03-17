@@ -41,11 +41,13 @@ public class PostDetailActivity extends AppCompatActivity {
     private RecyclerView recyclerViewComentarios;
     private ComentarioAdapter comentarioAdapter;
     private List<Comentario> comentarios;
+    private UserViewModel userViewModel;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         postViewModel = new PostViewModel();
+        userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
         binding = ActivityPostDetailBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         viewModel = new ViewModelProvider(this).get(PostDetailViewModel.class);
@@ -186,10 +188,16 @@ public class PostDetailActivity extends AppCompatActivity {
 
 
     private void detailInfo() {
-
         binding.nameUser.setText(getIntent().getStringExtra("username"));
-        binding.emailUser.setText(getIntent().getStringExtra("email"));
         binding.insta.setText(getIntent().getStringExtra("redsocial"));
+        //binding.emailUser.setText(getIntent().getStringExtra("email"));
+
+        userViewModel.obtenerEmailUsuario(getIntent().getStringExtra("userid"));
+
+        userViewModel.getEmailUsuarioLiveData().observe(this, email -> {
+            // Actualiza la UI con el correo
+            binding.emailUser.setText(email);
+        });
 
         String fotoUrl = getIntent().getStringExtra("foto_perfil");
         if (fotoUrl != null) {

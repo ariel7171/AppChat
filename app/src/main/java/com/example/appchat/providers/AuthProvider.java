@@ -39,7 +39,8 @@ public class AuthProvider {
             return authResult;
         }
 
-        ParseUser parseUser = new ParseUser();
+        //ParseUser parseUser = new ParseUser(); //linea 42
+        User parseUser = new User();
         parseUser.setUsername(user.getUsername() != null ? user.getUsername() : "defaultUsername");
         parseUser.setPassword(user.getPassword() != null ? user.getPassword() : "defaultPassword");
         parseUser.setEmail(user.getEmail() != null ? user.getEmail() : "default@example.com");

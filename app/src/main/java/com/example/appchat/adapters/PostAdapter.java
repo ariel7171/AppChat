@@ -13,11 +13,13 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.appchat.model.Post;
 import com.example.appchat.model.User;
 import com.example.appchat.providers.PostProvider;
 import com.example.appchat.view.PostDetailActivity;
+import com.example.appchat.viewmodel.UserViewModel;
 import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
@@ -96,6 +98,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
                     Log.d("PosDetail", "User: " + user.getEmail() + " " + user.getUsername());
                     if (user != null) {
                         Log.d("Postadapter", user.getUsername());
+                        intent.putExtra("userid", user.getId());
                         intent.putExtra("username", user.getUsername());
                         intent.putExtra("email", user.getEmail());
                         intent.putExtra("redsocial", user.getRedSocial());
@@ -134,5 +137,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
             ivImage3 = itemView.findViewById(R.id.ivImage3);
         }
     }
+
 }
 

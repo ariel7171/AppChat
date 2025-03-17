@@ -4,6 +4,7 @@ import android.app.Application;
 
 
 import com.example.appchat.model.Comentario;
+import com.example.appchat.model.Like;
 import com.example.appchat.model.Post;
 import com.example.appchat.model.User;
 import com.parse.Parse;
@@ -20,6 +21,7 @@ public class MyApplication extends Application {
         ParseObject.registerSubclass(Post.class);
         ParseObject.registerSubclass(User.class);
         ParseObject.registerSubclass(Comentario.class);
+        ParseObject.registerSubclass(Like.class);
         Parse.initialize(new Parse.Configuration.Builder(this)
                 .applicationId(getString(R.string.back4app_app_id))
                 .clientKey(getString(R.string.back4app_client_key))

@@ -4,14 +4,21 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import com.example.appchat.model.User;
 import com.parse.FindCallback;
+import com.parse.FunctionCallback;
+import com.parse.ParseCloud;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
+
+import java.util.HashMap;
 import java.util.List;
 import android.util.Log;
 
 public class UserProvider {
+
+    private final MutableLiveData<String> emailUsuarioLiveData = new MutableLiveData<>();
+    private final MutableLiveData<String> errorLiveData = new MutableLiveData<>();
 
     public UserProvider() {
         // Constructor vacío
@@ -90,4 +97,32 @@ public class UserProvider {
 
         return usersLiveData;
     }
+
+    // Método para obtener el email del usuario
+    public void obtenerEmailUsuario(String targetUserId) {
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("targetUserId", targetUserId);
+
+        ParseCloud.callFunctionInBackground("getUserEmail", params, new FunctionCallback<HashMap<String, Object>>() {
+            @Override
+            public void done(HashMap<String, Object> result, ParseException e) {
+                if (e == null) {
+                    String email = (String) result.get("email");
+                    emailUsuarioLiveData.postValue(email); // Publica el valor del correo
+                } else {
+                    errorLiveData.postValue(e.getMessage()); // Publica el error
+                }
+            }
+        });
+    }
+
+    // Métodos para exponer LiveData
+    public LiveData<String> getEmailUsuarioLiveData() {
+        return emailUsuarioLiveData;
+    }
+
+    public LiveData<String> getErrorLiveData() {
+        return errorLiveData;
+    }
+
 }

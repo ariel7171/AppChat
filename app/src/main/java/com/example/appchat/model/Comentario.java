@@ -11,7 +11,6 @@ public class Comentario extends ParseObject {
     public Comentario() {
         // Constructor vacío necesario para Parse
     }
-
     public String getId() {
         return getObjectId();
     }
