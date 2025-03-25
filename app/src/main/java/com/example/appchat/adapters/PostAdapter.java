@@ -46,8 +46,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
     public void onBindViewHolder(@NonNull PostViewHolder holder, int position) {
         Post post = posts.get(position);
         holder.tvTitulo.setText(post.getTitulo());
+        holder.tvUser.setText("by "+post.getUser().getUsername());
         holder.tvDescripcion.setText(post.getDescripcion());
-
 
         if (post.getImagenes() != null) {
             if (post.getImagenes().size() > 0) {
@@ -84,32 +84,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
 
                     // Datos del Post
                     // Log.d("Postadapter", postDetail.getId() + postDetail.getTitulo());
-                    intent.putExtra("post", post);
                     intent.putExtra("idPost", post.getId());
-                    intent.putExtra("titulo", postDetail.getTitulo());
-
-                    intent.putExtra("descripcion", postDetail.getDescripcion());
-                    intent.putExtra("categoria", postDetail.getCategoria());
-                    intent.putExtra("duracion", postDetail.getDuracion());
-                    intent.putExtra("presupuesto", postDetail.getPresupuesto());
-
-                    // Datos del Usuario
-                    User user = postDetail.getUser();
-                    Log.d("PosDetail", "User: " + user.getEmail() + " " + user.getUsername());
-                    if (user != null) {
-                        Log.d("Postadapter", user.getUsername());
-                        intent.putExtra("userid", user.getId());
-                        intent.putExtra("username", user.getUsername());
-                        intent.putExtra("email", user.getEmail());
-                        intent.putExtra("redsocial", user.getRedSocial());
-                        intent.putExtra("foto_perfil", user.getString("foto_perfil"));
-                    } else {
-                        Log.d("Postadapter", "User is null");
-                    }
-
-                    // Lista de imágenes
-                    ArrayList<String> imageUrls = new ArrayList<>(postDetail.getImagenes());
-                    intent.putStringArrayListExtra("imagenes", imageUrls);
 
                     // Lanza la actividad
                     context.startActivity(intent);
@@ -125,12 +100,13 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
     }
 
     public static class PostViewHolder extends RecyclerView.ViewHolder {
-        TextView tvTitulo, tvDescripcion;
+        TextView tvTitulo, tvUser, tvDescripcion;
         ImageView ivImage1, ivImage2, ivImage3;
 
         public PostViewHolder(View itemView) {
             super(itemView);
             tvTitulo = itemView.findViewById(R.id.tvTitulo);
+            tvUser = itemView.findViewById(R.id.tvUser);
             tvDescripcion = itemView.findViewById(R.id.tvDescripcion);
             ivImage1 = itemView.findViewById(R.id.ivImage1);
             ivImage2 = itemView.findViewById(R.id.ivImage2);

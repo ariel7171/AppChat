@@ -162,6 +162,7 @@
                 android:layout_height="wrap_content"
                 android:text="Eliminar Post"
                 android:layout_marginTop="16dp"
+                android:visibility="gone"
                 android:layout_gravity="center_horizontal"/>
 
             <TextView

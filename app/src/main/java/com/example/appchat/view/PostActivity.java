@@ -24,6 +24,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import com.example.appchat.model.Post;
 import com.example.appchat.util.Validaciones;
+import com.example.appchat.viewmodel.UserViewModel;
 import com.parse.ParseObject;
 
 import java.util.ArrayList;
@@ -155,6 +156,10 @@ public class PostActivity extends AppCompatActivity {
             binding.etPresupuesto.setError("Presupuesto no válido");
             return;
         }
+
+        // Desactivar el botón para evitar múltiples publicaciones
+        binding.btnPublicar.setEnabled(false);
+
         Post post = new Post();
         post.setTitulo(titulo);
         post.setDescripcion(descripcion);
@@ -163,10 +168,18 @@ public class PostActivity extends AppCompatActivity {
         post.setPresupuesto(presupuesto);
         post.setImagenes(new ArrayList<>(imagenesUrls));
 
-        // Desactivar el botón para evitar múltiples publicaciones
-        binding.btnPublicar.setEnabled(false);
+        UserViewModel userViewModel = new UserViewModel();
+        userViewModel.getCurrentUser().observe(PostActivity.this, currentUser ->{
+            if (currentUser!=null){
+                post.setUser(currentUser);
+                Log.d("PostActivity", "Usuario actual obtenido");
+                postViewModel.publicar(post);
+            }else {
+                Log.e("PostActivity", "Error al obtener el usuario actual");
+                binding.btnPublicar.setEnabled(true);
+            }
+        });
 
-        postViewModel.publicar(post);
     }
 
     private void updateRecyclerViewVisibility() {

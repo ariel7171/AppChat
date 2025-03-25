@@ -95,6 +95,3 @@ public class Post extends ParseObject {
         return bundle;
     }
 }
-
-
-

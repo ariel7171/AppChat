@@ -2,6 +2,8 @@ package com.example.appchat.providers;
 
 import com.example.appchat.model.User;
 
+import com.parse.Parse;
+import com.parse.ParseACL;
 import com.parse.ParseUser;
 import android.util.Log;
 import androidx.lifecycle.LiveData;
@@ -39,17 +41,18 @@ public class AuthProvider {
             return authResult;
         }
 
-        //ParseUser parseUser = new ParseUser(); //linea 42
-        User parseUser = new User();
-        parseUser.setUsername(user.getUsername() != null ? user.getUsername() : "defaultUsername");
-        parseUser.setPassword(user.getPassword() != null ? user.getPassword() : "defaultPassword");
-        parseUser.setEmail(user.getEmail() != null ? user.getEmail() : "default@example.com");
+        ParseACL acl = new ParseACL();
+        acl.setPublicReadAccess(true);
+        user.setACL(acl);
 
-        parseUser.signUpInBackground(e -> {
+        //Parse.getLocalDatastore().clear(); // Limpia datos locales
+        ParseUser.logOut();
+
+        user.signUpInBackground(e -> {
             if (e == null) {
                 // Registro exitoso
                 authResult.setValue("Registro exitoso"); // TODO: La linea original era: authResult.setValue(parseUser.getObjectId()); por eso mostraba el id en el showtoast
-                Log.d("AuthProvider", "Usuario registrado exitosamente: " + parseUser.getObjectId());
+                Log.d("AuthProvider", "Usuario registrado exitosamente: " + user.getId());
             } else {
                 // Error en el registro
                 Log.e("AuthProvider", "Error en registro: ", e);

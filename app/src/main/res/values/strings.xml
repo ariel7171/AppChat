@@ -40,6 +40,7 @@
 
     <string-array name="opciones_filtro">
         <item>Título</item>
+        <item>Usuario</item>
         <item>Descripción</item>
         <item>Categoría</item>
     </string-array>

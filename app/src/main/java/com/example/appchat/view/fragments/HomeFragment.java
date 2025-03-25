@@ -135,6 +135,3 @@ public class HomeFragment extends Fragment {
         binding = null; // Evitar fugas de memoria
     }
 }
-
-
-

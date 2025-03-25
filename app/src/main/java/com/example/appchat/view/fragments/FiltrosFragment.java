@@ -75,7 +75,7 @@ public class FiltrosFragment extends Fragment {
         progressBarLayout = inflater.inflate(R.layout.progress_layout, binding.getRoot(), false);
         binding.linear2.addView(progressBarLayout);
 
-        return binding.getRoot(); // Retornar la vista raíz del binding
+        return binding.getRoot();
     }
 
     @Override
@@ -89,22 +89,12 @@ public class FiltrosFragment extends Fragment {
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         hideProgressBar();
-
-        // Configurar el Spinner
         setupSpinner();
-
-        // Configurar el SearchView
         setupSearchView();
-
-        // Obtener todos los posts filtrados (inicialmente sin filtro)
-        //getAllFilterPost("");
-
-        // Configurar el menú
         setupMenu();
     }
 
     private void setupSpinner() {
-        // Obtener el Spinner desde el binding
         spinnerFiltro = binding.spinnerFiltro;
 
         // Crear un ArrayAdapter usando un array de strings y un layout por defecto para el Spinner
@@ -117,7 +107,6 @@ public class FiltrosFragment extends Fragment {
         // Especificar el layout que se usará cuando se despliegue la lista de opciones
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-        // Aplicar el adapter al Spinner
         spinnerFiltro.setAdapter(adapter);
 
         // Manejar la selección del Spinner
@@ -128,7 +117,7 @@ public class FiltrosFragment extends Fragment {
                 filtroSeleccionado = parent.getItemAtPosition(position).toString();
                 Log.d("FiltrosFragment", "Filtro seleccionado: " + filtroSeleccionado);
 
-                // Si hay un texto en el SearchView, aplicar el filtro nuevamente
+                // Si hay un texto en el SearchView aplicar el filtro
                 String query = binding.searchView.getQuery().toString();
                 if (!query.isEmpty()) {
                     getAllFilterPost(query);
@@ -156,7 +145,7 @@ public class FiltrosFragment extends Fragment {
         postViewModel.getPosts().observe(getViewLifecycleOwner(), posts -> {
             boolean flag = false;
             if (posts != null && !posts.isEmpty()) {
-                // Filtrar los posts según el texto y el filtro seleccionado
+                // Filtrar los posts segun el texto y la categoria seleccionada
                 List<Post> postsFiltrados = posts.stream()
                         .filter(post -> contieneTexto(texto, post, filtroSeleccionado))
                         .collect(Collectors.toList());
@@ -168,7 +157,7 @@ public class FiltrosFragment extends Fragment {
                 if (postsFiltrados.isEmpty()){
                     flag = true;
                 }
-                //hideProgressBar();
+
             } else {
                 Log.d("FiltrosFragment", "No hay posts disponibles.");
             }
@@ -185,7 +174,7 @@ public class FiltrosFragment extends Fragment {
         requireActivity().addMenuProvider(new MenuProvider() {
             @Override
             public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
-                // Inflar el menú
+                // Inflar el menu
                 menuInflater.inflate(R.menu.main_menu, menu);
             }
 
@@ -228,7 +217,7 @@ public class FiltrosFragment extends Fragment {
 
                 @Override
                 public boolean onQueryTextChange(String newText) {
-                    // Retrasar la ejecución hasta que el usuario deje de escribir
+                    // Retrasar la ejecucion hasta que el usuario deje de escribir
                     handler.removeCallbacks(filterRunnable); // Cancelar cualquier retraso pendiente
                     handler.postDelayed(filterRunnable, DEBOUNCE_DELAY); // Programar la ejecución
                     return true;
@@ -238,7 +227,7 @@ public class FiltrosFragment extends Fragment {
     }
 
     private void onLogout() {
-        // Manejar el cierre de sesión
+        // Manejar el cierre de sesion
         authViewModel.logout().observe(getViewLifecycleOwner(), logoutResult -> {
             if (logoutResult != null && logoutResult) {
                 // Navegar a MainActivity y limpiar la pila de actividades
@@ -246,7 +235,6 @@ public class FiltrosFragment extends Fragment {
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
             } else {
-                // Mostrar mensaje de error
                 Toast.makeText(getContext(), "Error al cerrar sesión. Intenta nuevamente.", Toast.LENGTH_SHORT).show();
             }
         });
@@ -261,13 +249,15 @@ public class FiltrosFragment extends Fragment {
     }
 
     private boolean contieneTexto(String texto, Post post, String filtro) {
-        // Convertir el texto de búsqueda a minúsculas para hacer la búsqueda insensible a mayúsculas/minúsculas
+
         texto = texto.toLowerCase();
 
-        // Filtrar según el criterio seleccionado
+        // Filtrar segun la categoria seleccionada
         switch (filtro) {
             case "Título":
                 return post.getTitulo() != null && post.getTitulo().toLowerCase().contains(texto);
+            case "Usuario":
+                return post.getUser().getUsername() != null && post.getUser().getUsername().toLowerCase().contains(texto);
             case "Descripción":
                 return post.getDescripcion() != null && post.getDescripcion().toLowerCase().contains(texto);
             case "Categoría":

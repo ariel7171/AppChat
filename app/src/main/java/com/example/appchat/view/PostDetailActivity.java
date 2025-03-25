@@ -1,242 +1,197 @@
 package com.example.appchat.view;
+
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+
 import com.example.appchat.R;
 import com.example.appchat.adapters.ComentarioAdapter;
-import com.example.appchat.adapters.EfectoTransformer;
 import com.example.appchat.adapters.ImageSliderAdapter;
 import com.example.appchat.databinding.ActivityPostDetailBinding;
 import com.example.appchat.model.Comentario;
 import com.example.appchat.model.Post;
 import com.example.appchat.model.User;
-import com.example.appchat.providers.ComentarioProvider;
 import com.example.appchat.viewmodel.ComentarioViewModel;
-import com.example.appchat.viewmodel.LikeViewModel;
-import com.example.appchat.viewmodel.PostDetailViewModel;
 import com.example.appchat.viewmodel.PostViewModel;
 import com.example.appchat.viewmodel.UserViewModel;
 import com.google.android.material.tabs.TabLayoutMediator;
+import com.parse.ParseObject;
 import com.parse.ParseUser;
 import com.squareup.picasso.Picasso;
-import androidx.annotation.Nullable;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class PostDetailActivity extends AppCompatActivity {
     private ActivityPostDetailBinding binding;
-    private PostDetailViewModel viewModel;
-    private String postId;
-    private ComentarioViewModel comentarioViewModel;
     private PostViewModel postViewModel;
-    private RecyclerView recyclerViewComentarios;
-    private ComentarioAdapter comentarioAdapter;
-    private List<Comentario> comentarios;
+    private ComentarioViewModel comentarioViewModel;
     private UserViewModel userViewModel;
-    private LikeViewModel likeViewModel;
+    private String postId;
+    private Post post;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        postViewModel = new PostViewModel();
-        userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
-        comentarioViewModel = new ViewModelProvider(this).get(ComentarioViewModel.class);
         binding = ActivityPostDetailBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        viewModel = new ViewModelProvider(this).get(PostDetailViewModel.class);
-        postId=getIntent().getStringExtra("idPost"); //"idPost"
-        detailInfo();
-        setupObservers();
 
-        binding.fabComentar.setOnClickListener(v -> showDialogComment());
+        // Inicializar ViewModels
+        postViewModel = new ViewModelProvider(this).get(PostViewModel.class);
+        comentarioViewModel = new ViewModelProvider(this).get(ComentarioViewModel.class);
+        userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
 
-        recyclerViewComentarios = findViewById(R.id.recyclerViewComentarios);
-        recyclerViewComentarios.setLayoutManager(new LinearLayoutManager(this));
 
-        // Obtener el ID del post que fue clickeado
-        String postId = getIntent().getStringExtra("idPost");
+        // Obtener ID del post
+        postId = getIntent().getStringExtra("idPost");
+        if (postId == null) {
+            Toast.makeText(this, "Error: Post no disponible", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
 
-        likeViewModel = new ViewModelProvider(this).get(LikeViewModel.class);
-        User currentUser =(User) ParseUser.getCurrentUser();
+        postViewModel.getPostById(postId).observe(this, postSeleccionado -> {
+            if (postSeleccionado != null) {
+                post = postSeleccionado;
+                setupObservers();
+                setupUI();
+                setupListeners();
+            } else {
+                Toast.makeText(this, "Error: Post no disponible", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        });
 
-        // Inicializa la lista de comentarios
-        comentarios = new ArrayList<>();
-        comentarioAdapter = new ComentarioAdapter(comentarios, currentUser, this);
-        recyclerViewComentarios.setAdapter(comentarioAdapter);
 
-        // Cargar comentarios desde el proveedor
-        loadComments(postId);
+    }
 
-        String currentUserName = currentUser.getUsername();
-        String perfilUserId = getIntent().getStringExtra("username");
+    private void setupObservers() {
+        // Observar datos del post
+        updatePostUI(post);
+        loadComments(); // Cargar comentarios después de obtener el post
 
-        if (currentUserName != null && currentUserName.equals(perfilUserId)) {
+        // Observar errores
+        postViewModel.getErrorMessage().observe(this, error -> {
+            if (error != null) Toast.makeText(this, error, Toast.LENGTH_SHORT).show();
+        });
+    }
+
+    private void setupUI() {
+        // Configurar RecyclerView
+        binding.recyclerViewComentarios.setLayoutManager(new LinearLayoutManager(this));
+        binding.recyclerViewComentarios.setAdapter(new ComentarioAdapter(new ArrayList<>(), (User) ParseUser.getCurrentUser(), this));
+        /*
+        // Mostrar botón de eliminar solo si es el autor
+        userViewModel.getCurrentUser().observe(this, currentUser -> {
+            if (currentUser != null && currentUser.getId().equals(post.getUser().getId())) {
+                binding.btnEliminarPost.setVisibility(View.VISIBLE);
+            }
+        });
+        */
+        String userId = ((User) ParseUser.getCurrentUser()).getId();
+        String postUserId = post.getUser().getId();
+        if (userId!=null && userId.equals(postUserId)){
             binding.btnEliminarPost.setVisibility(View.VISIBLE);
-            binding.btnEliminarPost.setOnClickListener(v -> confirmaBorrar());
-        } else {
-            binding.btnEliminarPost.setVisibility(View.GONE);
         }
 
     }
 
-    private void loadComments(String postId) {
+    private void updatePostUI(Post post) {
+        // Actualizar datos del post
+        binding.lugar.setText("Lugar: " + post.getTitulo());
+        binding.categoria.setText("Categoría: " + post.getCategoria());
+        binding.description.setText("Descripción: " + post.getDescripcion());
+        binding.duracion.setText("Duración: " + post.getDuracion() + " día/s");
+        binding.presupuesto.setText("Presupuesto: U$ " + post.getPresupuesto());
 
-        comentarioViewModel.getCommentsByPost(postId).observe(this, comentarios -> {
-            // Actualiza la lista de comentarios en el adaptador
-            if (comentarios != null) {
-                this.comentarios.clear();
-                this.comentarios.addAll(comentarios);
-                comentarioAdapter.notifyDataSetChanged(); // Notifica al adaptador que se han actualizado los datos
+        // Cargar imágenes
+        if (post.getImagenes() != null && !post.getImagenes().isEmpty()) {
+            binding.viewPager.setAdapter(new ImageSliderAdapter(post.getImagenes()));
+            new TabLayoutMediator(binding.tabLayout, binding.viewPager, (tab, position) -> {
+            }).attach();
+        }
+
+        // Cargar datos del usuario de forma segura
+        post.getUser().fetchIfNeededInBackground((parseUser, e) -> {
+            if (e == null) {
+                User user = (User) parseUser;
+                runOnUiThread(() -> {
+                    binding.nameUser.setText(user.getUsername());
+                    binding.insta.setText(user.getRedSocial());
+
+                    if (user.getString("foto_perfil") != null) {
+                        Picasso.get()
+                                .load(user.getString("foto_perfil"))
+                                .into(binding.circleImageView);
+                    }
+                });
             } else {
-                Log.d("PostDetailActivity", "No comentarios disponibles.");
+                Log.e("UserFetch", "Error al cargar el usuario: " + e.getMessage());
             }
+        });
+    }
 
+    private void loadComments() {
+        comentarioViewModel.getCommentsByPost(postId).observe(this, comentarios -> {
+            if (comentarios != null) {
+                ((ComentarioAdapter) binding.recyclerViewComentarios.getAdapter()).updateComments(comentarios);
+            }
+        });
+    }
+
+    private void setupListeners() {
+        // Botón de comentar
+        binding.fabComentar.setOnClickListener(v -> showDialogComment());
+
+        // Botón de eliminar
+        binding.btnEliminarPost.setOnClickListener(v -> new AlertDialog.Builder(this)
+                .setTitle("Confirmar eliminación")
+                .setMessage("¿Estás seguro de eliminar este post?")
+                .setPositiveButton("Eliminar", (d, w) -> eliminarPost())
+                .setNegativeButton("Cancelar", null)
+                .show());
+    }
+
+    private void eliminarPost(){
+        postViewModel.eliminarPost(postId);
+
+        postViewModel.getPostSuccess().observe(this, message -> {
+            if (message != null && message.equals("Post eliminado correctamente")) {
+                Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+                finish(); // Cierra la actividad actual
+            }
         });
     }
 
     private void showDialogComment() {
-        AlertDialog.Builder alert = new AlertDialog.Builder(PostDetailActivity.this);
-        alert.setTitle("¡COMENTARIO!");
-        alert.setMessage("Ingresa tu comentario: ");
+        EditText input = new EditText(this);
+        input.setHint("Escribe tu comentario...");
 
-        EditText editText = new EditText(PostDetailActivity.this);
-        editText.setHint("Texto");
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        );
-        editText.setLayoutParams(params);
-        params.setMargins(36, 0, 36, 36);
-
-        RelativeLayout container = new RelativeLayout(PostDetailActivity.this);
-        RelativeLayout.LayoutParams relativeParams = new RelativeLayout.LayoutParams(
-                RelativeLayout.LayoutParams.MATCH_PARENT,
-                RelativeLayout.LayoutParams.WRAP_CONTENT
-        );
-        container.setLayoutParams(relativeParams);
-        container.addView(editText);
-        alert.setView(container);
-        alert.setPositiveButton("Ok", (dialog, which) -> {
-            String value = editText.getText().toString().trim();
-            if (!value.isEmpty()) {
-                postViewModel.getPostById2(postId).observe(this, new Observer<Post>() {
-                    @Override
-                    public void onChanged(Post post) {
-                        if (post!=null) {
-                            Comentario comentario = new Comentario();
-                            comentario.setTexto(value);
-                            comentario.setPost(post);
-                            comentario.setUser((User) ParseUser.getCurrentUser());
-//                            comentarioViewModel.saveComment(comentario);
-//                            Toast.makeText(PostDetailActivity.this, "Comentario guardado correctamente", Toast.LENGTH_SHORT).show();
-//                            dialog.dismiss();
-                            comentarioViewModel.saveComment(comentario).observe(PostDetailActivity.this, result -> {
-                                if (result != null && result.equalsIgnoreCase("Comentario guardado exitosamente")) {
-                                    // Forzar recarga de comentarios
-                                    loadComments(postId);
-                                    Toast.makeText(PostDetailActivity.this, "Comentario guardado correctamente", Toast.LENGTH_SHORT).show();
-                                    dialog.dismiss();
-                                } else {
-                                    //Toast.makeText(PostDetailActivity.this, "Error al guardar comentario", Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                        }
+        new AlertDialog.Builder(this)
+                .setTitle("Nuevo comentario")
+                .setView(input)
+                .setPositiveButton("Publicar", (d, w) -> {
+                    String texto = input.getText().toString().trim();
+                    if (!texto.isEmpty()) {
+                        Comentario comentario = new Comentario();
+                        comentario.setTexto(texto);
+                        comentario.setPost(ParseObject.createWithoutData(Post.class, postId));
+                        comentario.setUser((User) ParseUser.getCurrentUser());
+                        comentarioViewModel.saveComment(comentario).observe(this, result -> {
+                            if (result != null && result.contains("exito")) {
+                                comentarioViewModel.getCommentsByPost(postId);
+                                loadComments();
+                            }
+                        });
                     }
-                });
-            } else {
-                Toast.makeText(PostDetailActivity.this, "El comentario no puede estar vacío", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        alert.setNegativeButton("Cancelar", (dialog, which) -> {
-            dialog.dismiss();
-        });
-        alert.show();
+                })
+                .setNegativeButton("Cancelar", null)
+                .show();
     }
-
-    private void setupObservers() {
-        viewModel.getCommentsLiveData().observe(this, comments -> {
-            // updateUI(comments);
-        });
-
-        viewModel.getErrorLiveData().observe(this, error -> {
-            if (error != null) {
-                Toast.makeText(this, "Error: " + error, Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-
-
-
-    private void detailInfo() {
-        binding.nameUser.setText(getIntent().getStringExtra("username"));
-        binding.insta.setText(getIntent().getStringExtra("redsocial"));
-        //binding.emailUser.setText(getIntent().getStringExtra("email"));
-        userViewModel.obtenerEmailUsuario(getIntent().getStringExtra("userid"));
-        userViewModel.getEmailUsuarioLiveData().observe(this, email -> {
-            // Actualiza la UI con el correo
-            binding.emailUser.setText(email);
-        });
-
-        String fotoUrl = getIntent().getStringExtra("foto_perfil");
-        if (fotoUrl != null) {
-            Picasso.get()
-                    .load(fotoUrl)
-                    .placeholder(R.drawable.ic_person)
-                    .error(R.drawable.ic_person)
-                    .into(binding.circleImageView);
-        } else {
-            binding.circleImageView.setImageResource(R.drawable.ic_person);
-        }
-
-        ArrayList<String> urls = getIntent().getStringArrayListExtra("imagenes");
-        String titulo = "Lugar: " + getIntent().getStringExtra("titulo");
-        binding.lugar.setText(titulo);
-        String categoria = "Categoria: " + getIntent().getStringExtra("categoria");
-        binding.categoria.setText(categoria);
-        String comentario = "descripción: " + getIntent().getStringExtra("descripcion");
-        binding.description.setText(comentario);
-        String duracion = "Duración: " + getIntent().getIntExtra("duracion", 0) + " día/s";
-        binding.duracion.setText(duracion);
-        String presupuesto = "Presupuesto: U$ " + getIntent().getDoubleExtra("presupuesto", 0.0);
-        binding.presupuesto.setText(presupuesto);
-
-        if (urls != null && !urls.isEmpty()) {
-            ImageSliderAdapter imageSliderAdapter = new ImageSliderAdapter(urls);
-            binding.viewPager.setAdapter(imageSliderAdapter);
-            binding.viewPager.setPageTransformer(new EfectoTransformer());
-
-            // Conexión TabLayout con ViewPager2
-            new TabLayoutMediator(binding.tabLayout, binding.viewPager, (tab, position) -> {
-            }).attach();
-        }
-    }
-
-    private void confirmaBorrar() {
-
-        AlertDialog.Builder alert = new AlertDialog.Builder(this);
-        alert.setTitle("Confirmación");
-        alert.setMessage("¿Estás seguro de que deseas eliminar este post?");
-
-        alert.setPositiveButton("Eliminar", (dialog, which) -> postViewModel.eliminarPost(postId));
-
-        alert.setNegativeButton("Cancelar", (dialog, which) -> dialog.dismiss());
-
-        alert.show();
-    }
-
 }
-
-

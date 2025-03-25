@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -16,6 +17,7 @@ import com.example.appchat.model.Comentario;
 import com.example.appchat.model.User;
 import com.example.appchat.providers.LikeProvider;
 import com.example.appchat.viewmodel.ComentarioViewModel;
+import com.squareup.picasso.Picasso;
 
 import java.util.HashMap;
 import java.util.List;
@@ -58,6 +60,12 @@ public class ComentarioAdapter extends RecyclerView.Adapter<ComentarioAdapter.Co
 
         if (comentario.getUser() != null) {
             holder.tvUsuario.setText(comentario.getUser().getUsername());
+
+            if (comentario.getUser().getFotoperfil()!=null) {
+                Picasso.get()
+                        .load(comentario.getUser().getFotoperfil())
+                        .into(holder.ivPerfil);
+            }
 
             // Comprueba si el usuario actual es el creador del comentario
             if (currentUser != null && currentUser.getObjectId().equals(comentario.getUser().getObjectId())) {
@@ -212,6 +220,7 @@ public class ComentarioAdapter extends RecyclerView.Adapter<ComentarioAdapter.Co
     public static class ComentarioViewHolder extends RecyclerView.ViewHolder {
         TextView tvUsuario, tvComentario, tvLikesCount, tvDislikesCount, tvDelete;
         ImageButton btnLike, btnDislike;
+        ImageView ivPerfil;
 
         public ComentarioViewHolder(View itemView) {
             super(itemView);
@@ -222,6 +231,7 @@ public class ComentarioAdapter extends RecyclerView.Adapter<ComentarioAdapter.Co
             btnLike = itemView.findViewById(R.id.btnLike);
             btnDislike = itemView.findViewById(R.id.btnDislike);
             tvDelete = itemView.findViewById(R.id.tvDelete);
+            ivPerfil = itemView.findViewById(R.id.ivPerfil);
         }
     }
 }

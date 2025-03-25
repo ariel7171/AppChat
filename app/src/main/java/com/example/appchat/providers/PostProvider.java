@@ -21,6 +21,10 @@ public class PostProvider {
     public LiveData<String> addPost(Post post) {
         MutableLiveData<String> result = new MutableLiveData<>();
         // Configurar campos y ACL...
+        ParseACL acl = new ParseACL();
+        acl.setPublicReadAccess(true);
+        acl.setWriteAccess(post.getUser().getId(), true);
+        post.setACL(acl);
         post.saveInBackground(e -> {
             if (e == null) {
                 List<String> imagenes = post.getImagenes();
@@ -84,57 +88,12 @@ public class PostProvider {
     public LiveData<List<Post>> getAllPosts() {
         MutableLiveData<List<Post>> result = new MutableLiveData<>();
         ParseQuery<Post> query = ParseQuery.getQuery(Post.class);
-        query.include("user"); // Asegúrate de incluir el usuario relacionado
+        query.include("user"); // Incluye el objeto User completo
         query.findInBackground((posts, e) -> {
             if (e == null) {
-                List<Post> postList = new ArrayList<>();
-                for (ParseObject postObject : posts) {
-                    Log.d("PostObject", "ID: " + postObject.getObjectId() + ", Title: " + postObject.getString("titulo"));
-
-                    Post post = ParseObject.create(Post.class);
-                    post.setObjectId(postObject.getObjectId());
-                    post.setTitulo(postObject.getString("titulo"));
-                    post.setDescripcion(postObject.getString("descripcion"));
-                    post.setDuracion(postObject.getInt("duracion"));
-                    post.setCategoria(postObject.getString("categoria"));
-                    post.setPresupuesto(postObject.getDouble("presupuesto"));
-                    // Obtener imágenes
-                    ParseRelation<ParseObject> relation = postObject.getRelation("images");
-                    try {
-                        List<ParseObject> images = relation.getQuery().find();
-                        List<String> imageUrls = new ArrayList<>();
-                        for (ParseObject imageObject : images) {
-                            imageUrls.add(imageObject.getString("url"));
-                        }
-                        post.setImagenes(imageUrls);
-                    } catch (ParseException parseException) {
-                        parseException.printStackTrace();
-                    }
-                    // Mapeo del usuario
-                    ParseUser parseUser = postObject.getParseUser("user");
-                    if (parseUser != null) {
-                        try {
-                            parseUser.fetchIfNeeded();
-                            User user = ParseObject.createWithoutData(User.class, parseUser.getObjectId());
-                            user.setUsername(parseUser.getUsername());
-                            user.setEmail(parseUser.getEmail());
-                            user.setFotoperfil(parseUser.getString("fotoperfil"));
-                            user.setRedSocial(parseUser.getString("redSocial"));
-
-                            post.setUser(user); // Asignar el usuario convertido al post
-                        } catch (ParseException parseException) {
-                            Log.e("FetchUserError", "Error al obtener el usuario: ", parseException);
-                        }
-                    } else {
-                        Log.d("UserPointer", "User pointer es null");
-                    }
-
-                    postList.add(post);
-                }
-                result.setValue(postList);
+                result.setValue(posts);
             } else {
                 result.setValue(new ArrayList<>());
-                Log.e("ParseError", "Error al recuperar todos los posts: ", e);
             }
         });
         return result;
@@ -212,6 +171,7 @@ public class PostProvider {
         return result;
     }
 
+    /*
     public void getPostById(String postId, GetPostCallback callback) {
         ParseQuery<Post> query = ParseQuery.getQuery(Post.class);
         query.whereEqualTo("objectId", postId);
@@ -232,8 +192,9 @@ public class PostProvider {
         void onSuccess(Post post);
         void onError(String errorMessage);
     }
+    */
 
-    public LiveData<Post> getPostById2(String postId) {
+    public LiveData<Post> getPostById(String postId) {
         MutableLiveData<Post> result = new MutableLiveData<>();
         ParseQuery<Post> query = ParseQuery.getQuery(Post.class);
         query.whereEqualTo("objectId", postId);

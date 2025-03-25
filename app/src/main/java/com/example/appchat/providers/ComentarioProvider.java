@@ -6,8 +6,6 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.appchat.model.Comentario;
-import com.example.appchat.model.Post;
-import com.example.appchat.model.User;
 import com.parse.ParseACL;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
@@ -16,26 +14,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ComentarioProvider {
+    private final MutableLiveData<List<Comentario>> commentsLiveData = new MutableLiveData<>();
+
+    public ComentarioProvider() {
+    }
 
     public LiveData<List<Comentario>> getCommentsByPost(String postId) {
-        MutableLiveData<List<Comentario>> result = new MutableLiveData<>();
-        if (postId==null) {
-            result.setValue(new ArrayList<>());
-            return result;
+        if (postId == null) {
+            commentsLiveData.setValue(new ArrayList<>());
+            return commentsLiveData;
         }
         ParseQuery<Comentario> query = ParseQuery.getQuery(Comentario.class);
         query.whereEqualTo("post", ParseObject.createWithoutData("Post", postId));
         query.include("user");
         query.findInBackground((comentarios, e) -> {
             if (e == null) {
-                Log.d("ComentarioProvider", "Comentarios supuestamente obtenidos: " + comentarios);
-                result.setValue(comentarios);
+                commentsLiveData.setValue(comentarios);
             } else {
-                result.setValue(new ArrayList<>());
-                Log.e("ParseError", "Error al recuperar los comentarios: ", e);
+                commentsLiveData.setValue(new ArrayList<>());
             }
         });
-        return result;
+        return commentsLiveData;
     }
 
     public LiveData<String> saveComment(Comentario comentario){
@@ -50,6 +49,7 @@ public class ComentarioProvider {
             if (e == null) {
                 // Importante: solo establece el valor una vez
                 if (result.getValue() == null) {
+                    getCommentsByPost(comentario.getPost().getObjectId());
                     result.setValue("Comentario guardado exitosamente");
                     Log.d("ComentarioProvider", "Comentario guardado exitosamente: " + comentario.getObjectId());
                 }
@@ -91,6 +91,10 @@ public class ComentarioProvider {
         });
 
         return result;
+    }
+
+    public LiveData<List<Comentario>> getCommentsLiveData(){
+        return commentsLiveData;
     }
 
 }

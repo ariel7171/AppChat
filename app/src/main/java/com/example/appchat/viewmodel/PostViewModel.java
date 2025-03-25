@@ -28,10 +28,10 @@ public class PostViewModel extends ViewModel {
 
     // Cargar posts y actualizar el MutableLiveData
     public void loadPosts() {
-        postProvider.getAllPosts().observeForever(newPosts -> {
-            posts.setValue(newPosts);
-        });
+        postProvider.getAllPosts().observeForever(posts::setValue);
     }
+
+
 
     public LiveData<String> getPostSuccess() {
         return postSuccess;
@@ -65,21 +65,6 @@ public class PostViewModel extends ViewModel {
         return postProvider.countPostsByCurrentUser();
     }
 
-    // Método para obtener un Post por ID
-    public void getPostById(String postId) {
-        postProvider.getPostById(postId, new PostProvider.GetPostCallback() {
-            @Override
-            public void onSuccess(Post post) {
-                postLiveData.setValue(post); // Actualiza el LiveData con el post obtenido
-            }
-
-            @Override
-            public void onError(String error) {
-                errorMessage.setValue(error); // Actualiza el LiveData con el mensaje de error
-            }
-        });
-    }
-
     // Método para obtener el LiveData del Post
     public LiveData<Post> getPost() {
         return postLiveData;
@@ -90,8 +75,8 @@ public class PostViewModel extends ViewModel {
         return errorMessage;
     }
 
-    public LiveData<Post> getPostById2(String postId) {
-        return postProvider.getPostById2(postId);
+    public LiveData<Post> getPostById(String postId) {
+        return postProvider.getPostById(postId);
     }
 
     public LiveData<List<Post>> getPostsByCurrentUser() {

@@ -11,13 +11,13 @@ import java.util.List;
 
 public class ComentarioViewModel extends ViewModel {
     private final ComentarioProvider comentarioProvider = new ComentarioProvider();
-
     private final MutableLiveData<List<Comentario>> commentsLiveData = new MutableLiveData<>();
 
     public ComentarioViewModel() {}
 
     public LiveData<List<Comentario>> getCommentsByPost(String postId) {
-        return comentarioProvider.getCommentsByPost(postId);
+        comentarioProvider.getCommentsByPost(postId).observeForever(commentsLiveData::setValue);
+        return commentsLiveData;
     }
 
     public LiveData<String> saveComment(Comentario comentario) {
