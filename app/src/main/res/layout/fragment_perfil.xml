@@ -159,7 +159,6 @@
                     android:backgroundTint="@color/primary"
                     android:layout_marginTop="20dp"
                     android:textColor="@color/white" />
-
             </LinearLayout>
 
             <LinearLayout
@@ -292,24 +291,16 @@
 
             </LinearLayout>
 
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"/>
+
+
         </LinearLayout>
 
 
     </androidx.core.widget.NestedScrollView>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="150dp"
 
-        android:orientation="horizontal"
-        android:layout_gravity="bottom"
-        >
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:importantForAccessibility="no"
-            android:src="@drawable/back_bottom"
-            android:scaleType="centerCrop"
-            android:layout_gravity="end"
-            tools:ignore="UnusedAttribute" />
-    </LinearLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

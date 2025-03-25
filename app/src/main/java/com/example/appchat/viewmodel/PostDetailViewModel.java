@@ -29,32 +29,6 @@ public class PostDetailViewModel extends ViewModel {
         return errorLiveData;
     }
 
-   /*
-    public void fetchComments(String postId) {
-        postProvider.fetchComments(postId, new PostProvider.CommentsCallback() {
-            @Override
-            public void onSuccess(List<ParseObject> comments) {
-                commentsLiveData.postValue(comments);
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-                errorLiveData.postValue(e.getMessage());
-            }
-        });
-    }
-
-    public void saveComment(String postId, String commentText) {
-        ParseUser currentUser = ParseUser.getCurrentUser();
-        postProvider.saveComment(postId, commentText, currentUser, e -> {
-            if (e == null) {
-                fetchComments(postId);
-            } else {
-                errorLiveData.postValue(e.getMessage());
-            }
-        });
-    }
-    */
 }
 
 

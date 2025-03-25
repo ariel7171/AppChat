@@ -17,10 +17,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import com.example.appchat.R;
+import com.example.appchat.adapters.PostAdapter;
 import com.example.appchat.databinding.FragmentPerfilBinding;
 import com.example.appchat.model.User;
 import com.example.appchat.util.ImageUtils;
 import com.example.appchat.util.Validaciones;
+import com.example.appchat.view.HomeActivity;
 import com.example.appchat.view.MainActivity;
 import com.example.appchat.view.RegisterActivity;
 import com.example.appchat.viewmodel.PostViewModel;
@@ -38,6 +40,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -85,6 +88,24 @@ public class PerfilFragment extends Fragment {
                 binding.postCount.setText(count.toString());
             }
         });
+
+        // Configurar RecyclerView
+        binding.recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        postViewModel.getPostsByCurrentUser().observe(getViewLifecycleOwner(), posts -> {
+            if (posts != null && !posts.isEmpty()) {
+                Log.d("PerfilFragment", "Número de posts: " + posts.size());
+                PostAdapter adapter = new PostAdapter(posts);
+                binding.recyclerView.setAdapter(adapter);
+                adapter.notifyDataSetChanged();
+                ((HomeActivity) requireActivity()).hideProgressBar();
+            } else {
+                Log.d("PerfilFragment", "No hay posts disponibles.");
+                ((HomeActivity) requireActivity()).hideProgressBar();
+            }
+        });
+
+
     }
 
     private void setupMenu() {

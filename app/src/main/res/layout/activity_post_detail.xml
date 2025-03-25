@@ -156,6 +156,25 @@
                 android:textSize="14sp"
                 android:layout_marginBottom="8dp" />
 
+            <Button
+                android:id="@+id/btnEliminarPost"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Eliminar Post"
+                android:layout_marginTop="16dp"
+                android:layout_gravity="center_horizontal"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Comentarios:"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                android:paddingBottom="3dp"
+                android:paddingTop="8dp"
+                />
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerViewComentarios"
                 android:layout_width="match_parent"

@@ -1,6 +1,7 @@
 package com.example.appchat.view;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -17,6 +18,7 @@ import com.example.appchat.model.Post;
 import com.example.appchat.model.User;
 import com.example.appchat.providers.ComentarioProvider;
 import com.example.appchat.viewmodel.ComentarioViewModel;
+import com.example.appchat.viewmodel.LikeViewModel;
 import com.example.appchat.viewmodel.PostDetailViewModel;
 import com.example.appchat.viewmodel.PostViewModel;
 import com.example.appchat.viewmodel.UserViewModel;
@@ -42,23 +44,20 @@ public class PostDetailActivity extends AppCompatActivity {
     private ComentarioAdapter comentarioAdapter;
     private List<Comentario> comentarios;
     private UserViewModel userViewModel;
+    private LikeViewModel likeViewModel;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         postViewModel = new PostViewModel();
         userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
+        comentarioViewModel = new ViewModelProvider(this).get(ComentarioViewModel.class);
         binding = ActivityPostDetailBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         viewModel = new ViewModelProvider(this).get(PostDetailViewModel.class);
         postId=getIntent().getStringExtra("idPost"); //"idPost"
         detailInfo();
         setupObservers();
-        /*
-        if (postId != null) {
-            viewModel.fetchComments(postId);
-        }
-        */
 
         binding.fabComentar.setOnClickListener(v -> showDialogComment());
 
@@ -68,17 +67,31 @@ public class PostDetailActivity extends AppCompatActivity {
         // Obtener el ID del post que fue clickeado
         String postId = getIntent().getStringExtra("idPost");
 
+        likeViewModel = new ViewModelProvider(this).get(LikeViewModel.class);
+        User currentUser =(User) ParseUser.getCurrentUser();
+
         // Inicializa la lista de comentarios
         comentarios = new ArrayList<>();
-        comentarioAdapter = new ComentarioAdapter(comentarios);
+        comentarioAdapter = new ComentarioAdapter(comentarios, currentUser, this);
         recyclerViewComentarios.setAdapter(comentarioAdapter);
 
         // Cargar comentarios desde el proveedor
         loadComments(postId);
+
+        String currentUserName = currentUser.getUsername();
+        String perfilUserId = getIntent().getStringExtra("username");
+
+        if (currentUserName != null && currentUserName.equals(perfilUserId)) {
+            binding.btnEliminarPost.setVisibility(View.VISIBLE);
+            binding.btnEliminarPost.setOnClickListener(v -> confirmaBorrar());
+        } else {
+            binding.btnEliminarPost.setVisibility(View.GONE);
+        }
+
     }
 
     private void loadComments(String postId) {
-        comentarioViewModel = new ViewModelProvider(this).get(ComentarioViewModel.class);
+
         comentarioViewModel.getCommentsByPost(postId).observe(this, comentarios -> {
             // Actualiza la lista de comentarios en el adaptador
             if (comentarios != null) {
@@ -91,27 +104,6 @@ public class PostDetailActivity extends AppCompatActivity {
 
         });
     }
-
-    private void showComments(){
-        comentarioViewModel = new ViewModelProvider(this).get(ComentarioViewModel.class);
-        Log.d("PostDetailActivity", "postID: " + postId);
-        if (postId != null) {
-            Log.d("PostDetailActivity", "postID no es nulo");
-            comentarioViewModel.getCommentsByPost(postId).observe(this, comentarios -> {
-                if (comentarios != null) {
-                    // Iterar a través de la lista de comentarios y registrarlos
-                    for (Comentario comentario : comentarios) {
-                        Log.d("PostDetailActivity", "Comentario: " + comentario.getTexto());
-                    }
-                } else {
-                    Log.d("PostDetailActivity", "No comentarios disponibles.");
-                }
-            });
-        }
-
-
-    }
-
 
     private void showDialogComment() {
         AlertDialog.Builder alert = new AlertDialog.Builder(PostDetailActivity.this);
@@ -127,7 +119,6 @@ public class PostDetailActivity extends AppCompatActivity {
         editText.setLayoutParams(params);
         params.setMargins(36, 0, 36, 36);
 
-
         RelativeLayout container = new RelativeLayout(PostDetailActivity.this);
         RelativeLayout.LayoutParams relativeParams = new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.MATCH_PARENT,
@@ -136,11 +127,9 @@ public class PostDetailActivity extends AppCompatActivity {
         container.setLayoutParams(relativeParams);
         container.addView(editText);
         alert.setView(container);
-
         alert.setPositiveButton("Ok", (dialog, which) -> {
             String value = editText.getText().toString().trim();
             if (!value.isEmpty()) {
-
                 postViewModel.getPostById2(postId).observe(this, new Observer<Post>() {
                     @Override
                     public void onChanged(Post post) {
@@ -149,14 +138,22 @@ public class PostDetailActivity extends AppCompatActivity {
                             comentario.setTexto(value);
                             comentario.setPost(post);
                             comentario.setUser((User) ParseUser.getCurrentUser());
-                            comentarioViewModel.saveComment(comentario);
-                            Toast.makeText(PostDetailActivity.this, "Comentario guardado correctamente", Toast.LENGTH_SHORT).show();
-                            dialog.dismiss();
-                            //showComments(); // Refresca los comentarios después de guardar uno nuevo
+//                            comentarioViewModel.saveComment(comentario);
+//                            Toast.makeText(PostDetailActivity.this, "Comentario guardado correctamente", Toast.LENGTH_SHORT).show();
+//                            dialog.dismiss();
+                            comentarioViewModel.saveComment(comentario).observe(PostDetailActivity.this, result -> {
+                                if (result != null && result.equalsIgnoreCase("Comentario guardado exitosamente")) {
+                                    // Forzar recarga de comentarios
+                                    loadComments(postId);
+                                    Toast.makeText(PostDetailActivity.this, "Comentario guardado correctamente", Toast.LENGTH_SHORT).show();
+                                    dialog.dismiss();
+                                } else {
+                                    //Toast.makeText(PostDetailActivity.this, "Error al guardar comentario", Toast.LENGTH_SHORT).show();
+                                }
+                            });
                         }
                     }
                 });
-
             } else {
                 Toast.makeText(PostDetailActivity.this, "El comentario no puede estar vacío", Toast.LENGTH_SHORT).show();
             }
@@ -165,17 +162,13 @@ public class PostDetailActivity extends AppCompatActivity {
         alert.setNegativeButton("Cancelar", (dialog, which) -> {
             dialog.dismiss();
         });
-
         alert.show();
     }
 
     private void setupObservers() {
         viewModel.getCommentsLiveData().observe(this, comments -> {
-
             // updateUI(comments);
-
         });
-
 
         viewModel.getErrorLiveData().observe(this, error -> {
             if (error != null) {
@@ -191,9 +184,7 @@ public class PostDetailActivity extends AppCompatActivity {
         binding.nameUser.setText(getIntent().getStringExtra("username"));
         binding.insta.setText(getIntent().getStringExtra("redsocial"));
         //binding.emailUser.setText(getIntent().getStringExtra("email"));
-
         userViewModel.obtenerEmailUsuario(getIntent().getStringExtra("userid"));
-
         userViewModel.getEmailUsuarioLiveData().observe(this, email -> {
             // Actualiza la UI con el correo
             binding.emailUser.setText(email);
@@ -232,6 +223,20 @@ public class PostDetailActivity extends AppCompatActivity {
             }).attach();
         }
     }
+
+    private void confirmaBorrar() {
+
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setTitle("Confirmación");
+        alert.setMessage("¿Estás seguro de que deseas eliminar este post?");
+
+        alert.setPositiveButton("Eliminar", (dialog, which) -> postViewModel.eliminarPost(postId));
+
+        alert.setNegativeButton("Cancelar", (dialog, which) -> dialog.dismiss());
+
+        alert.show();
+    }
+
 }
 
 

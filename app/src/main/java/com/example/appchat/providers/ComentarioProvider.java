@@ -44,16 +44,53 @@ public class ComentarioProvider {
 
         ParseACL acl = new ParseACL();
         acl.setPublicReadAccess(true);
+        acl.setPublicWriteAccess(true);
         comentario.setACL(acl);
         comentario.saveInBackground(e -> {
             if (e == null) {
-                result.setValue("Comentario guardado exitosamente");
-                Log.d("ComentarioProvider", "Comentario guardado exitosamente: " + comentario.getObjectId());
+                // Importante: solo establece el valor una vez
+                if (result.getValue() == null) {
+                    result.setValue("Comentario guardado exitosamente");
+                    Log.d("ComentarioProvider", "Comentario guardado exitosamente: " + comentario.getObjectId());
+                }
             } else {
-                result.setValue("Error al guardar el comentario: " + e.getMessage());
-                Log.e("ComentarioProvider", "Error al guardar el comentario: ", e);
+                // Importante: solo establece el valor una vez
+                if (result.getValue() == null) {
+                    result.setValue("Error al guardar el comentario: " + e.getMessage());
+                    Log.e("ComentarioProvider", "Error al guardar el comentario: ", e);
+                }
             }
         });
         return result;
     }
+
+    public LiveData<String> deleteComment(String commentId) {
+        MutableLiveData<String> result = new MutableLiveData<>();
+
+        if (commentId == null) {
+            result.setValue("ID del comentario no puede ser nulo");
+            return result;
+        }
+
+        ParseQuery<Comentario> query = ParseQuery.getQuery(Comentario.class);
+        query.getInBackground(commentId, (comentario, e) -> {
+            if (e == null) {
+                comentario.deleteInBackground(deleteError -> {
+                    if (deleteError == null) {
+                        result.setValue("Comentario eliminado exitosamente");
+                        Log.d("ComentarioProvider", "Comentario eliminado exitosamente: " + commentId);
+                    } else {
+                        result.setValue("Error al eliminar el comentario: " + deleteError.getMessage());
+                        Log.e("ComentarioProvider", "Error al eliminar el comentario: ", deleteError);
+                    }
+                });
+            } else {
+                result.setValue("No se encontró el comentario: " + e.getMessage());
+                Log.e("ParseError", "Error al recuperar el comentario para eliminar: ", e);
+            }
+        });
+
+        return result;
+    }
+
 }

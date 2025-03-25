@@ -14,4 +14,9 @@
     <color name="colorGray">#D5D2D2</color>
     <color name="colorGrayLight">#F1EFEF</color>
     <color name="colorGrayIcon">#BEBEBE</color>
+
+    <!-- Colores para likes/dislikes -->
+    <color name="like_active">#4CAF50</color> <!-- Verde para likes activos -->
+    <color name="dislike_active">#F44336</color> <!-- Rojo para dislikes activos -->
+    <color name="gray">#757575</color> <!-- Gris para botones inactivos -->
 </resources>

@@ -1,25 +1,99 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_marginBottom="70dp"
     tools:context=".view.fragments.FiltrosFragment">
-
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        >
-        <androidx.appcompat.widget.Toolbar
-            android:layout_width="match_parent"
-            android:layout_height="150dp"
-            android:elevation="4dp"
-            android:background="@drawable/headerbkg"
-            app:title="@string/Filtros"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
-        </androidx.appcompat.widget.Toolbar>
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/tools"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@drawable/headerbkg"
+            app:title="Filtros"
+            app:titleTextColor="@android:color/white" />
     </com.google.android.material.appbar.AppBarLayout>
 
-</FrameLayout>
+    <LinearLayout
+        android:id="@+id/linear1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="70dp"
+        android:padding="16dp">
+
+        <!-- Contenedor para SearchView y Spinner -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp">
+
+            <!-- Spinner para seleccionar el filtro -->
+            <Spinner
+                android:id="@+id/spinnerFiltro"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/spinner_background"
+                android:padding="8dp"
+                android:spinnerMode="dropdown"
+                android:popupBackground="@android:color/white"
+                android:popupElevation="4dp"
+                android:dropDownVerticalOffset="8dp"
+                android:dropDownWidth="wrap_content"/>
+
+            <!-- Espacio entre Spinner y SearchView -->
+            <Space
+                android:layout_width="16dp"
+                android:layout_height="0dp"/>
+
+            <!-- SearchView para buscar posts -->
+            <androidx.appcompat.widget.SearchView
+                android:id="@+id/searchView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:iconifiedByDefault="false"
+                android:queryHint="Buscar posts..."
+                app:theme="@style/CustomSearchView"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linear2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            >
+
+            <TextView
+                android:id="@+id/filtrosText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="4"
+                android:text="Ingrese un palabra para filtrar"
+                android:textSize="18sp"
+                android:textColor="@color/lavender"
+                android:gravity="center" />
+
+        </LinearLayout>
+
+
+        <!-- RecyclerView para mostrar los posts -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+    </LinearLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

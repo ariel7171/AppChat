@@ -29,4 +29,16 @@
 
     <!-- App theme reference -->
     <style name="Theme.AppChat" parent="Base.Theme.AppChat" />
+
+    <style name="CustomSearchView" parent="Widget.AppCompat.SearchView">
+        <!-- Color del hint -->
+        <item name="android:textColorHint">@color/colorGray</item> <!-- Gris medio -->
+        <!-- Color del texto ingresado -->
+        <item name="android:textColor">@color/black</item> <!-- Negro -->
+        <!-- Color del ícono de búsqueda -->
+        <item name="searchHintIcon">@color/black</item> <!-- Negro -->
+        <!-- Fondo del campo de búsqueda -->
+        <item name="queryBackground">@drawable/searchview_background</item>
+    </style>
+
 </resources>

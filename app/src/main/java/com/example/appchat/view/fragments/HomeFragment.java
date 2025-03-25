@@ -67,6 +67,14 @@ public class HomeFragment extends Fragment {
         // Configurar RecyclerView
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
+        // Observar la creación de posts
+        postViewModel.getPostCreated().observe(getViewLifecycleOwner(), isCreated -> {
+            if (Boolean.TRUE.equals(isCreated)) {
+                // Recargar los posts
+                postViewModel.reloadPosts();
+            }
+        });
+
         postViewModel.getPosts().observe(getViewLifecycleOwner(), posts -> {
             if (posts != null && !posts.isEmpty()) {
                 Log.d("HomeFragment", "Número de posts: " + posts.size());
@@ -79,7 +87,6 @@ public class HomeFragment extends Fragment {
                 ((HomeActivity) requireActivity()).hideProgressBar();
             }
         });
-
 
         setupMenu();
     }
@@ -114,6 +121,12 @@ public class HomeFragment extends Fragment {
                 Toast.makeText(getContext(), "Error al cerrar sesión. Intenta nuevamente.", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        postViewModel.reloadPosts(); // Recargar datos al volver al fragmento
     }
 
     @Override

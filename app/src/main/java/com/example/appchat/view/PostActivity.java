@@ -63,8 +63,19 @@ public class PostActivity extends AppCompatActivity {
     private void setupViewModels() {
         postViewModel = new ViewModelProvider(this).get(PostViewModel.class);
         postViewModel.getPostSuccess().observe(this, exito -> {
-            Toast.makeText(this, exito, Toast.LENGTH_SHORT).show();
-            finish();
+            // Agregamos un log para depuración
+            Log.d("PostActivity", "Resultado de publicación: " + exito);
+
+            if (exito != null && exito.equals("Post publicado")) {
+                // Agregamos un Toast para confirmar
+                Toast.makeText(this, "Post publicado exitosamente", Toast.LENGTH_SHORT).show();
+
+                // Usamos runOnUiThread para asegurar que esto ocurra en el hilo principal
+                runOnUiThread(() -> {
+                    // Finalizamos la actividad
+                    finish();
+                });
+            }
         });
     }
 
@@ -151,6 +162,10 @@ public class PostActivity extends AppCompatActivity {
         post.setCategoria(categoria);
         post.setPresupuesto(presupuesto);
         post.setImagenes(new ArrayList<>(imagenesUrls));
+
+        // Desactivar el botón para evitar múltiples publicaciones
+        binding.btnPublicar.setEnabled(false);
+
         postViewModel.publicar(post);
     }
 

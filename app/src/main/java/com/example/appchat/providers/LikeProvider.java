@@ -93,9 +93,9 @@ public class LikeProvider {
             if (e1 == null) {
                 dislikesQuery.countInBackground((dislikesCount, e2) -> {
                     if (e2 == null) {
-                        result.setValue(new int[]{likesCount, 0});
-                    } else {
                         result.setValue(new int[]{likesCount, dislikesCount});
+                    } else {
+                        result.setValue(new int[]{likesCount, 0});
                     }
                 });
             } else {
